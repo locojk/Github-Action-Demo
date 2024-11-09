@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_a42f733555e54743b265c63a6cc22c81 }}/nextjs-fastapi:${{ github.sha }}
+        tags: index.docker.io/locajk/nextjs-fastapi:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -48,4 +48,4 @@ jobs:
         app-name: 'GNG-5300-week-9'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_7d31a5930f0c4c799a754909dfc72c0e }}
-        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_a42f733555e54743b265c63a6cc22c81 }}/nextjs-fastapi:${{ github.sha }}'
+        images: 'index.docker.io/locajk/nextjs-fastapi:${{ github.sha }}'
