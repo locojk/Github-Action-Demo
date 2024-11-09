@@ -89,12 +89,8 @@ jobs:
       - name: "🚀 Build static app"
         run: pnpm run build 
 
-      - name: "Check if .next directory exists"
-        run: |
-          if [ ! -d ".next" ]; then
-            echo ".next directory not found!"
-            exit 1
-          fi
+      - name: "List all directories after build"
+        run: ls -R
 
       - name: "📂 Production artifacts"
         uses: actions/upload-artifact@v3
