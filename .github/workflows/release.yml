@@ -87,7 +87,7 @@ jobs:
           artifact_name: "diagram"
 
       - name: "🚀 Build static app"
-        run: pnpm run build  # Ensure this command generates output in the 'build' directory
+        run: npm run build  # Ensure this command generates output in the 'build' directory
 
       - name: "📂 Production artifacts"
         uses: actions/upload-artifact@v3
