@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_0f1c743e038d4dda8ce7895016883299 }}/nextjs-fastapi:${{ github.sha }}
+        tags: index.docker.io/locajk/nextjs-fastapi:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
