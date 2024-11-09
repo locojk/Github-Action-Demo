@@ -27,7 +27,6 @@ jobs:
       - name: "🔨 Build and Export Next.js Site"
         run: |
           pnpm run build
-          npx next export  # Exports static files to the 'out' directory
 
       - name: "🚀 Deploy to GitHub Pages"
         uses: peaceiris/actions-gh-pages@v3
