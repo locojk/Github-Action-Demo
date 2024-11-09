@@ -9,6 +9,10 @@ on:
     - cron: '56 5 * * 1'
   workflow_call:
 
+permissions:
+  contents: read
+  security-events: write  # Explicitly grant permissions for security events
+
 jobs:
   analyze:
     name: Analyze
@@ -38,4 +42,5 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+
 
