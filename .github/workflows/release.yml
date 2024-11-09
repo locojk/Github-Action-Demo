@@ -87,7 +87,14 @@ jobs:
           artifact_name: "diagram"
 
       - name: "🚀 Build static app"
-        run: npm run build  # Ensure this command generates output in the 'build' directory
+        run: pnpm run build 
+
+      - name: "Check if .next directory exists"
+        run: |
+          if [ ! -d ".next" ]; then
+            echo ".next directory not found!"
+            exit 1
+          fi
 
       - name: "📂 Production artifacts"
         uses: actions/upload-artifact@v3
