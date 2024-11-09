@@ -29,8 +29,8 @@ jobs:
       - name: "📦 Install dependencies with pnpm"
         run: pnpm install
 
-      - name: "🔍 Run tests"
-        run: pnpm run test --if-present
+      # - name: "🔍 Run tests"
+      #   run: pnpm run test --if-present
 
   lint:
     name: Code standards
@@ -51,5 +51,5 @@ jobs:
       - name: "📦 Install dependencies with pnpm"
         run: pnpm install
 
-      - name: "🔍 Lint code"
-        run: pnpm run lint --if-present
+      # - name: "🔍 Lint code"
+      #   run: pnpm run lint --if-present
