@@ -67,7 +67,7 @@ jobs:
           node-version: 20
 
       - name: "📦 Install dependencies"  # Directly run npm install instead of bahmutov/npm-install
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: "📊 Repository visualizer"
         id: diagram
