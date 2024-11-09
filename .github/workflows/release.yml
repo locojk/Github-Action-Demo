@@ -92,8 +92,8 @@ jobs:
       - name: "📂 Production artifacts"
         uses: actions/upload-artifact@v3
         with:
-          name: build  # This should match the download name in the release job
-          path: build  # Ensure the path exists and contains the build output
+          name: next-build  # This should match the download name in the release job
+          path: .next  # Ensure the path exists and contains the build output
 
   release:
     name: Semantic release
@@ -125,8 +125,8 @@ jobs:
       - name: "📂 Download build artifacts"
         uses: actions/download-artifact@v3
         with:
-          name: build  # This must match the name in the upload-artifact step
-          path: build  # This should be where the artifact is placed locally
+          name: next-build  # This must match the name in the upload-artifact step
+          path: .next  # This should be where the artifact is placed locally
 
       - name: "📂 Download diagram artifacts"
         uses: actions/download-artifact@v3
