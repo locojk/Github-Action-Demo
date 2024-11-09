@@ -9,15 +9,7 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
-  test:
-    name: Test and lint
-    uses: ./.github/workflows/development.yml
-    
   build:
     runs-on: 'ubuntu-latest'
 
@@ -27,18 +19,18 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    - name: Log in to the Container registry
-      uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+    - name: Log in to registry
+      uses: docker/login-action@v2
       with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: https://ghcr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_d163c08b07e443c7a0e0ee67d293fb00 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_aa227f922c9f46f39cbe75b162d39974 }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: latest
+        tags: ghcr.io/${{ secrets.AzureAppService_ContainerUsername_d163c08b07e443c7a0e0ee67d293fb00 }}/nextjs-fastapi:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -55,5 +47,5 @@ jobs:
       with:
         app-name: 'GNG-5300-week-9'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_335d2f42c0574418b40b3f4dc84776aa }}
-        images: 'ghcr.io/${{ secrets.AzureAppService_ContainerUsername_efed3c170c6a4a2a944eda9cf03a6ac5 }}/locojk/nextjs-fastapi:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_c39e84e8c6454e9198503546b0c4c44a }}
+        images: 'ghcr.io/${{ secrets.AzureAppService_ContainerUsername_d163c08b07e443c7a0e0ee67d293fb00 }}/nextjs-fastapi:${{ github.sha }}'
