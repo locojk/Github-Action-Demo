@@ -21,10 +21,10 @@ jobs:
       - name: "🔧 Setup Node.js"
         uses: actions/setup-node@v2.1.5
         with:
-          node-version: 20  # Update to the Node.js version you need
+          node-version: 20  # Use Node.js 20
 
       - name: "🔧 Install pnpm"
-        run: npm install -g pnpm
+        run: npm install -g pnpm  # Install pnpm globally
 
       - name: "📦 Install dependencies with pnpm"
         run: pnpm install
@@ -43,13 +43,14 @@ jobs:
       - name: "🔧 Setup Node.js"
         uses: actions/setup-node@v2.1.5
         with:
-          node-version: 20  # Update to the Node.js version you need
+          node-version: 20  # Use Node.js 20
 
       - name: "🔧 Install pnpm"
-        run: npm install -g pnpm
+        run: npm install -g pnpm  # Install pnpm globally
 
       - name: "📦 Install dependencies with pnpm"
         run: pnpm install
 
       - name: "🔍 Lint code"
         run: pnpm run lint --if-present
+
