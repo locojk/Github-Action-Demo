@@ -13,25 +13,29 @@ jobs:
       - name: "☁️ Checkout repository"
         uses: actions/checkout@v4
 
-      - name: "🔧 Setup Node.js"
-        uses: actions/setup-node@v4
+      - name: "🔧 Setup Docker Buildx"
+        uses: docker/setup-buildx-action@v2
+
+      - name: "📦 Build Docker Image"
+        uses: docker/build-push-action@v3
         with:
-          node-version: 20
+          context: .
+          push: false  # No need to push to a registry
+          tags: nextjs-static-export
 
-      - name: "🔧 Install pnpm"
-        run: npm install -g pnpm  # Install pnpm globally
-
-      - name: "📦 Install dependencies with pnpm"
-        run: pnpm install
-
-      - name: "📦 Build static site"
-        run: pnpm run build
+      - name: "📂 Copy Static Files from Docker"
+        # Run a new container from the built image and copy the files out
+        run: |
+          container_id=$(docker create nextjs-static-export)
+          docker cp $container_id:/app/out ./out
+          docker rm $container_id
 
       - name: "🚀 Deploy to GitHub Pages"
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: "out"  # This is the default output directory for static exports in Next.js
+          publish_dir: ./out  # Directory to publish
           commit_message: "Deploy Next.js site to GitHub Pages"
           enable_jekyll: false
+
 
