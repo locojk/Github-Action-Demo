@@ -1,0 +1,55 @@
+name: Development
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+  workflow_call:
+
+jobs:
+  test:
+    name: Test application
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: "☁️ Checkout repository"
+        uses: actions/checkout@v2
+
+      - name: "🔧 Setup Node.js"
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 20  # Update to the Node.js version you need
+
+      - name: "🔧 Install pnpm"
+        run: npm install -g pnpm
+
+      - name: "📦 Install dependencies with pnpm"
+        run: pnpm install
+
+      - name: "🔍 Run tests"
+        run: pnpm run test --if-present
+
+  lint:
+    name: Code standards
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: "☁️ Checkout repository"
+        uses: actions/checkout@v2
+
+      - name: "🔧 Setup Node.js"
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 20  # Update to the Node.js version you need
+
+      - name: "🔧 Install pnpm"
+        run: npm install -g pnpm
+
+      - name: "📦 Install dependencies with pnpm"
+        run: pnpm install
+
+      - name: "🔍 Lint code"
+        run: pnpm run lint --if-present
