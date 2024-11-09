@@ -1,0 +1,39 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - stories/**
+      - src/components/**
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "🔧 setup node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: "🔧 Install pnpm"
+        run: npm install -g pnpm  # Install pnpm globally
+
+      - name: "📦 Install dependencies with pnpm"
+        run: pnpm install
+
+      - name: "📦 build Storybook"
+        run: npx build
+
+      - name: "🚀 deploy static"
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./-static
+          commit_message: ${{ github.event.head_commit.message }}
+          enable_jekyll: false
