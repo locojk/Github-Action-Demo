@@ -3,14 +3,12 @@ name: Release
 on:
   push:
     branches:
-    # Specifies that this workflow will run on a push event to the main, alpha, or beta branches.
       - main
       - alpha
       - beta
 
 jobs:
   test:
-  # Runs a reusable workflow defined in .github/workflows/development.yml to test and lint the code.
     name: Test and lint
     uses: ./.github/workflows/development.yml
 
@@ -39,7 +37,7 @@ jobs:
           images: ${{ github.repository }}
           tags: latest
 
-      # Build docker use docker file
+      # Build Docker image using the Dockerfile
       - name: "📦 Docker build"
         uses: docker/build-push-action@v3
         with:
@@ -51,52 +49,12 @@ jobs:
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
 
-      # Uploads the Docker image as an artifact named docker so it can be used in later jobs.
+      # Upload the Docker image as an artifact
       - name: "📂 Docker artifacts"
         uses: actions/upload-artifact@v3
         with:
           name: docker
           path: /tmp/docker.tar
-
-  build:
-    name: Build application
-    runs-on: ubuntu-latest
-    steps:
-      - name: "☁️ Checkout repository"
-        uses: actions/checkout@v4
-
-      - name: "🔧 Setup Node.js"
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: "🔧 Install pnpm"
-        run: npm install -g pnpm  # Install pnpm globally
-
-      - name: "📦 Install dependencies"  
-        run: pnpm install 
-
-      - name: "📊 Repository visualizer"
-        id: diagram
-        uses: githubocto/repo-visualizer@0.7.1
-        with:
-          excluded_paths: "node_modules,build,.storybook,.netlify,.github,npm-shrinkwrap.json"
-          output_file: "public/diagram.svg"
-          should_push: false
-          root_path: "src/"
-          artifact_name: "diagram"
-
-      - name: "🚀 Build static app"
-        run: pnpm run build 
-
-      - name: "List all directories after build"
-        run: ls -R
-
-      - name: "📂 Production artifacts"
-        uses: actions/upload-artifact@v3
-        with:
-          name: next-build  # This should match the download name in the release job
-          path: .next  # Ensure the path exists and contains the build output
 
   release:
     name: Semantic release
@@ -104,9 +62,8 @@ jobs:
       name: production
       url: https://github.com/${{ github.repository }}/releases/tag/${{ steps.semantic-release.outputs.release-tag }}
     needs:
-      # - test
+      - test
       - docker
-      - build
     runs-on: ubuntu-latest
     steps:
       - name: "☁️ Checkout repository"
@@ -125,18 +82,6 @@ jobs:
           docker load --input /tmp/docker.tar
           docker image ls -a
 
-      - name: "📂 Download build artifacts"
-        uses: actions/download-artifact@v3
-        with:
-          name: next-build  # This must match the name in the upload-artifact step
-          path: .next  # This should be where the artifact is placed locally
-
-      - name: "📂 Download diagram artifacts"
-        uses: actions/download-artifact@v3
-        with:
-          name: diagram
-          path: .
-
       - name: "🚀 Release"
         id: semantic-release
         uses: open-sauced/semantic-release-conventional-config@v3
@@ -149,12 +94,10 @@ jobs:
       - release
     runs-on: ubuntu-latest
     steps:
-      - name: "♻️ Remove build artifacts"
+      - name: "♻️ Remove artifacts"
         uses: geekyeggo/delete-artifact@v1
         with:
-          name: |
-            build
-            docker
-            diagram
+          name: docker
+
 
 
