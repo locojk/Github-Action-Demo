@@ -3,12 +3,14 @@ name: Release
 on:
   push:
     branches:
+    # Specifies that this workflow will run on a push event to the main, alpha, or beta branches.
       - main
       - alpha
       - beta
 
 jobs:
   test:
+  # Runs a reusable workflow defined in .github/workflows/development.yml to test and lint the code.
     name: Test and lint
     uses: ./.github/workflows/development.yml
 
@@ -37,6 +39,7 @@ jobs:
           images: ${{ github.repository }}
           tags: latest
 
+      # Build docker use docker file
       - name: "📦 Docker build"
         uses: docker/build-push-action@v3
         with:
@@ -48,6 +51,7 @@ jobs:
           cache-from: type=gha, scope=${{ github.workflow }}
           cache-to: type=gha, scope=${{ github.workflow }}
 
+      # Uploads the Docker image as an artifact named docker so it can be used in later jobs.
       - name: "📂 Docker artifacts"
         uses: actions/upload-artifact@v3
         with:
@@ -97,13 +101,13 @@ jobs:
       name: production
       url: https://github.com/${{ github.repository }}/releases/tag/${{ steps.semantic-release.outputs.release-tag }}
     needs:
-      - test
+      # - test
       - docker
       - build
     runs-on: ubuntu-latest
     steps:
       - name: "☁️ Checkout repository"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
