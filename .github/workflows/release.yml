@@ -12,49 +12,33 @@ jobs:
     name: Test and lint
     uses: ./.github/workflows/development.yml
 
-  docker:
-    name: Build container
+  build-static:
+    name: Build static Next.js application
     runs-on: ubuntu-latest
     steps:
       - name: "☁️ Checkout repository"
         uses: actions/checkout@v4
 
-      - name: "🔧 Setup buildx"
-        uses: docker/setup-buildx-action@v2
-
-      - name: "🔧 Cache Docker layers"
-        uses: actions/cache@v3
+      - name: "🔧 Setup Node.js"
+        uses: actions/setup-node@v4
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
+          node-version: 20
 
-      - name: "🔧 Docker meta"
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ github.repository }}
-          tags: latest
+      - name: "🔧 Install pnpm"
+        run: npm install -g pnpm  # Installs pnpm globally
 
-      # Build Docker image using the Dockerfile
-      - name: "📦 Docker build"
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=docker,dest=/tmp/docker.tar
-          push: false
-          cache-from: type=gha, scope=${{ github.workflow }}
-          cache-to: type=gha, scope=${{ github.workflow }}
+      - name: "📦 Install dependencies"
+        run: pnpm install
 
-      # Upload the Docker image as an artifact
-      - name: "📂 Docker artifacts"
+      - name: "🔨 Build static site"
+        run: pnpm run build  # Builds the Next.js application
+        # Since output is set to "export" in next.config.js, it will build to the 'out' directory automatically
+
+      - name: "📂 Upload static build as artifact"
         uses: actions/upload-artifact@v3
         with:
-          name: docker
-          path: /tmp/docker.tar
+          name: next-static-build
+          path: out  # Directory containing the static site
 
   release:
     name: Semantic release
@@ -63,7 +47,7 @@ jobs:
       url: https://github.com/${{ github.repository }}/releases/tag/${{ steps.semantic-release.outputs.release-tag }}
     needs:
       - test
-      - docker
+      - build-static
     runs-on: ubuntu-latest
     steps:
       - name: "☁️ Checkout repository"
@@ -71,16 +55,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "📂 Download Docker artifacts"
+      - name: "📂 Download build artifact"
         uses: actions/download-artifact@v3
         with:
-          name: docker
-          path: /tmp
-
-      - name: "📦 Load Docker tag"
-        run: |
-          docker load --input /tmp/docker.tar
-          docker image ls -a
+          name: next-static-build
+          path: ./out
 
       - name: "🚀 Release"
         id: semantic-release
@@ -97,7 +76,109 @@ jobs:
       - name: "♻️ Remove artifacts"
         uses: geekyeggo/delete-artifact@v1
         with:
-          name: docker
+          name: next-static-build
+
+
+# name: Release
+
+# on:
+#   push:
+#     branches:
+#       - main
+#       - alpha
+#       - beta
+
+# jobs:
+#   test:
+#     name: Test and lint
+#     uses: ./.github/workflows/development.yml
+
+#   docker:
+#     name: Build container
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: "☁️ Checkout repository"
+#         uses: actions/checkout@v4
+
+#       - name: "🔧 Setup buildx"
+#         uses: docker/setup-buildx-action@v2
+
+#       - name: "🔧 Cache Docker layers"
+#         uses: actions/cache@v3
+#         with:
+#           path: /tmp/.buildx-cache
+#           key: ${{ runner.os }}-buildx-${{ github.sha }}
+#           restore-keys: |
+#             ${{ runner.os }}-buildx-
+
+#       - name: "🔧 Docker meta"
+#         id: meta
+#         uses: docker/metadata-action@v4
+#         with:
+#           images: ${{ github.repository }}
+#           tags: latest
+
+#       # Build Docker image using the Dockerfile
+#       - name: "📦 Docker build"
+#         uses: docker/build-push-action@v3
+#         with:
+#           context: .
+#           tags: ${{ steps.meta.outputs.tags }}
+#           labels: ${{ steps.meta.outputs.labels }}
+#           outputs: type=docker,dest=/tmp/docker.tar
+#           push: false
+#           cache-from: type=gha, scope=${{ github.workflow }}
+#           cache-to: type=gha, scope=${{ github.workflow }}
+
+#       # Upload the Docker image as an artifact
+#       - name: "📂 Docker artifacts"
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: docker
+#           path: /tmp/docker.tar
+
+#   release:
+#     name: Semantic release
+#     environment:
+#       name: production
+#       url: https://github.com/${{ github.repository }}/releases/tag/${{ steps.semantic-release.outputs.release-tag }}
+#     needs:
+#       - test
+#       - docker
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: "☁️ Checkout repository"
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+
+#       - name: "📂 Download Docker artifacts"
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: docker
+#           path: /tmp
+
+#       - name: "📦 Load Docker tag"
+#         run: |
+#           docker load --input /tmp/docker.tar
+#           docker image ls -a
+
+#       - name: "🚀 Release"
+#         id: semantic-release
+#         uses: open-sauced/semantic-release-conventional-config@v3
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#   cleanup:
+#     name: Cleanup actions
+#     needs:
+#       - release
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: "♻️ Remove artifacts"
+#         uses: geekyeggo/delete-artifact@v1
+#         with:
+#           name: docker
 
 
 
