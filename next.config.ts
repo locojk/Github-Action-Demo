@@ -13,16 +13,16 @@
 //   },
 // };
 
-// /** @type {import('next').NextConfig} */
-// const nextConfig: import('next').NextConfig = {
-//   output: "standalone",
-// };
-
 /** @type {import('next').NextConfig} */
 const nextConfig: import('next').NextConfig = {
-  output: "export",
-  reactStrictMode: true
+  output: "standalone",
 };
+
+// /** @type {import('next').NextConfig} */
+// const nextConfig: import('next').NextConfig = {
+//   output: "export",
+//   reactStrictMode: true
+// };
 
 
 export default nextConfig;
