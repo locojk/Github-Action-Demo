@@ -66,8 +66,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: "📦 Install dependencies"
-        uses: bahmutov/npm-install@v1
+      - name: "📦 Install dependencies"  # Directly run npm install instead of bahmutov/npm-install
+        run: npm install
 
       - name: "📊 Repository visualizer"
         id: diagram
@@ -146,3 +146,4 @@ jobs:
             build
             docker
             diagram
+
